@@ -2,21 +2,22 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Data;
 using WebApplication1.Models;
+using WebApplication1.Services;
 
 namespace WebApplication1.Controllers
 {
     public class WarehouseController : Controller
     {
-        private readonly TestContext _context;
+        private readonly IWarehouseService _warehouseService;
 
-        public WarehouseController(TestContext context)
+        public WarehouseController(IWarehouseService warehouseService)
         {
-            _context = context;
+            _warehouseService = warehouseService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var warehouses = await _context.Warehouses.ToListAsync();
+            var warehouses = await _warehouseService.GetAllCategoriesAsync();
             return View(warehouses);
         }
 
@@ -34,16 +35,15 @@ namespace WebApplication1.Controllers
                 Name = model.Name,
                 Description = model.Description
             };
-            
-            await _context.AddAsync(warehouse);
-            await _context.SaveChangesAsync();
+
+            await _warehouseService.CreateWarehouseAsync(warehouse);
            
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var warehouse = await _context.Warehouses.FindAsync(id);
+            var warehouse = await _warehouseService.GetWarehouseAsync(id);
             var model = new WarehouseForModification
             {
                 Id = id,
@@ -63,19 +63,16 @@ namespace WebApplication1.Controllers
                 Description = model.Description
             };
 
-            _context.Update(warehouse);
-            await _context.SaveChangesAsync();
+            await _warehouseService.UpdateWarehouseAsync(warehouse);
 
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var warehouse = await _context.Warehouses.FindAsync(id);
-            
-            _context.Remove(warehouse);
-            await _context.SaveChangesAsync();
+            //var warehouse = await _warehouseService.GetWarehouseAsync(id);
 
+            await _warehouseService.DeleteWarehouseAsync(id);
             return RedirectToAction(nameof(Index));
         }
     }

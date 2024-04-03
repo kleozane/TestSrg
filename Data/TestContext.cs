@@ -10,5 +10,5 @@ namespace WebApplication1.Data
         }
 
         public DbSet<Warehouse> Warehouses { get; set; }
-    }
+    } 
 }
